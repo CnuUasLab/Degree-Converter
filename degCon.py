@@ -2,9 +2,8 @@
 CNU UAS Team's degree conversion software
 
 Usage:
-  degCon.py
   degCon.py <d> [<m> <s>]
-  degCon.py [--import <file>] [--out <file>]
+  degCon.py --import <file> [--out <file>]
   degCon.py -h | --help
   degCon.py --version
   
@@ -73,7 +72,8 @@ def main(args):
         else:
             cnvtd = from_dms(df,mf,sf)
         out_str = ", ".join(str(i) for i in cnvtd)
-        output.write(out_str)
+        if(args['<d>'] != None):
+            output.write(out_str)
         print out_str
 
 
@@ -95,7 +95,7 @@ def from_dms(d, m, s):
 
 if __name__ == '__main__':
     # Parse args
-    arguments = docopt(__doc__, version="0.1.0")
+    arguments = docopt(__doc__, version="1.0.1")
     print arguments
     
     # setup output file
