@@ -3,7 +3,8 @@ CNU UAS Team's degree conversion software
 
 Usage:
   degCon.py
-  degCon.py <d> [<m>] [<s>] [--out <file>]
+  degCon.py <d> [<m> <s>]
+  degCon.py [--import <file>] [--out <file>]
   degCon.py -h | --help
   degCon.py --version
   
@@ -21,10 +22,11 @@ __author__ = 'Christopher Newport Unmanned Aerial Systems Lab Software Team'
 # Import from libs folder
 # Docopt is used for parsing command line args.
 from docopt import docopt
+import os
 
 SUPPORTED_FILETYPE = [".txt", ".csv"]
 
-def main(arguments):
+def main(args):
     """Main Function
     Args:
       arguments (dictionary): The parameters dictionary. See above
@@ -32,44 +34,62 @@ def main(arguments):
     Returns:
 
     """
-    print "entered main"
 
-    d = arguments['<d>']
-    m = arguments['<m>']
-    s = arguments['<s>']
-
-    df = float(d)
-
-    toDD = False
-    if(m != None and s != None):
-        mf = float(m)
-        sf = float(s)
-        toDD = True
-        
-    if(toDD == False and df.is_integer()):
-        print 'Convert {0} to D,M,S. Are you Sure (Y/n)?'.format(df)
-        if(raw_input().lower() == 'n'):
-            print 'exiting'
-            exit(1)
-
-    if(toDD == False):
-        from_dd(df)
+    inFile = False
+    degrees = []
+    
+    if(args['--import'] != None):
+        inFile = True
+        with open(args['--import'], "r") as inStream:
+            for line in inStream:
+                currLine = line.rstrip('\n').split(",")
+                degrees.append(currLine)
     else:
-        from_dms(df,mf,sf)
+        line = []
+        line.append(args['<d>'])
+        line.append(args['<m>'])
+        line.append(args['<s>'])
+        degrees.append(line)
+                    
+    print degrees
+
+    for deg in degrees:
+        df = float(deg[0])
+
+        toDD = False
+        if(len(deg) == 3 and deg[1] != None and deg[2] != None):
+            mf = float(deg[1])
+            sf = float(deg[2])
+            toDD = True
+            
+        if(toDD == False and df.is_integer()):
+            print 'Convert {0} to D,M,S. Are you Sure (Y/n)?'.format(df)
+            if(raw_input().lower() == 'n'):
+                print 'exiting'
+                exit(1)
+
+        if(toDD == False):
+            cnvtd = from_dd(df)
+        else:
+            cnvtd = from_dms(df,mf,sf)
+        out_str = ", ".join(str(i) for i in cnvtd)
+        output.write(out_str)
+        print out_str
+
 
 def from_dd(dd):
     print 'entered from_dd', dd
-    d = int(dd)
-    m = int((dd - d) * 60)
-    s = int((dd - d - m/60) * 3600)
-    print 'out: ', d, ',', m, ',', s
-    output.write(str(d) + ',' + str(m) + ',' + str(s))
+    cnvtd = []
+    cnvtd.append(int(dd))
+    cnvtd.append(int((dd - cnvtd[0]) * 60))
+    cnvtd.append(int((dd - cnvtd[0] - cnvtd[1]/60) * 3600))
+    return cnvtd
 
 def from_dms(d, m, s):
+    cnvtd = []
     print 'entered from_dms', d, m, s
-    dd = d + m/60 + s/3600
-    print 'out: ', dd
-    output.write(str(dd))
+    cnvtd.append(d + m/60 + s/3600)
+    return cnvtd
 
     ## TODO: add other argument functionality in here
 
