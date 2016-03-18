@@ -6,7 +6,7 @@ Usage:
   degCon.py --import <file> [--out <file>]
   degCon.py -h | --help
   degCon.py --version
-  
+
 Options:
   -h, --help                    show this screen.
   -i <file>, --import <file>    convert degrees from a file.
@@ -36,7 +36,7 @@ def main(args):
 
     inFile = False
     degrees = []
-    
+
     if(args['--import'] != None):
         inFile = True
         with open(args['--import'], "r") as inStream:
@@ -49,7 +49,7 @@ def main(args):
         line.append(args['<m>'])
         line.append(args['<s>'])
         degrees.append(line)
-                    
+
     print degrees
 
     for deg in degrees:
@@ -60,7 +60,7 @@ def main(args):
             mf = float(deg[1])
             sf = float(deg[2])
             toDD = True
-            
+
         if(toDD == False and df.is_integer()):
             print 'Convert {0} to D,M,S. Are you Sure (Y/n)?'.format(df)
             if(raw_input().lower() == 'n'):
@@ -82,7 +82,7 @@ def from_dd(dd):
     cnvtd = []
     cnvtd.append(int(dd))
     cnvtd.append(int((dd - cnvtd[0]) * 60))
-    cnvtd.append(int((dd - cnvtd[0] - cnvtd[1]/60) * 3600))
+    cnvtd.append(round((dd - cnvtd[0] - cnvtd[1]/60.0) * 3600, 5))
     return cnvtd
 
 def from_dms(d, m, s):
@@ -97,11 +97,11 @@ if __name__ == '__main__':
     # Parse args
     arguments = docopt(__doc__, version="1.0.1")
     print arguments
-    
+
     # setup output file
     output_file = arguments['--out']
     output = open(output_file, "wb")
-    
+
     main(arguments)
-    
+
     output.close()
